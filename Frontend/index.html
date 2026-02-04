@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spam Email Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            display: block;
+            color: #4a5568;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .textarea-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #email {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+        }
+
+        #email:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #email::placeholder {
+            color: #a0aec0;
+        }
+
+        .check-button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .check-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .check-button:active {
+            transform: translateY(0);
+        }
+
+        .check-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .result-section {
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .result-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .result-card.spam {
+            background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+            border-color: #fc8181;
+        }
+
+        .result-card.ham {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-color: #68d391;
+        }
+
+        .result-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .result-icon.spam {
+            color: #e53e3e;
+        }
+
+        .result-icon.ham {
+            color: #38a169;
+        }
+
+        .prediction {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .probability {
+            font-size: 1.1rem;
+            font-weight: 500;
+            text-align: center;
+            color: #4a5568;
+        }
+
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            #email {
+                min-height: 100px;
+                padding: 16px;
+            }
+        }
+
+        /* Glassmorphism effect */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Smooth animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> Spam Email Detector</h1>
+            <p>Advanced AI-powered email classification system</p>
+        </div>
+
+        <div class="input-section">
+            <label class="input-label" for="email">
+                <i class="fas fa-envelope"></i> Email Content
+            </label>
+            <div class="textarea-container">
+                <textarea 
+                    id="email" 
+                    placeholder="Paste your email content here to check if it's spam or legitimate..."
+                ></textarea>
+            </div>
+            
+            <button class="check-button" onclick="checkSpam()">
+                <div class="loading-spinner"></div>
+                <span class="button-text">
+                    <i class="fas fa-search"></i> Analyze Email
+                </span>
+            </button>
+        </div>
+
+        <div id="result" class="result-section"></div>
+
+        <div class="footer">
+            <p><i class="fas fa-robot"></i> Powered by Machine Learning</p>
+        </div>
+    </div>
+
+<script>
+async function checkSpam() {
+    const emailText = document.getElementById("email").value;
+    const button = document.querySelector('.check-button');
+    const spinner = document.querySelector('.loading-spinner');
+    const buttonText = document.querySelector('.button-text');
+    const resultSection = document.getElementById("result");
+
+    // Validation
+    if (!emailText.trim()) {
+        showError("Please enter email content to analyze.");
+        return;
+    }
+
+    // Show loading state
+    button.disabled = true;
+    spinner.style.display = 'inline-block';
+    buttonText.innerHTML = '<i class="fas fa-cog fa-spin"></i> Analyzing...';
+    resultSection.classList.remove('show');
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: emailText })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // Display results
+        const isSpam = data.prediction.toLowerCase() === 'spam';
+        const icon = isSpam ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+        const cardClass = isSpam ? 'spam' : 'ham';
+
+        resultSection.innerHTML = `
+            <div class="result-card ${cardClass}">
+                <div class="result-icon ${cardClass}">
+                    <i class="${icon}"></i>
+                </div>
+                <div class="prediction">
+                    ${data.prediction.toUpperCase()}
+                </div>
+                <div class="probability">
+                    Spam Confidence: ${data.probability}%
+                </div>
+            </div>
+        `;
+
+        resultSection.classList.add('show');
+
+    } catch (error) {
+        showError("Failed to analyze email. Please check your connection and try again.");
+    } finally {
+        // Reset button state
+        button.disabled = false;
+        spinner.style.display = 'none';
+        buttonText.innerHTML = '<i class="fas fa-search"></i> Analyze Email';
+    }
+}
+
+function showError(message) {
+    const resultSection = document.getElementById("result");
+    resultSection.innerHTML = `
+        <div class="result-card" style="background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%); border-color: #fc8181;">
+            <div class="result-icon" style="color: #e53e3e;">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="prediction" style="color: #e53e3e;">
+                Error
+            </div>
+            <div class="probability">
+                ${message}
+            </div>
+        </div>
+    `;
+    resultSection.classList.add('show');
+}
+
+// Add smooth scroll and focus effects
+document.getElementById("email").addEventListener('focus', function() {
+    this.parentElement.style.transform = 'scale(1.02)';
+});
+
+document.getElementById("email").addEventListener('blur', function() {
+    this.parentElement.style.transform = 'scale(1)';
+});
+</script>
+
+</body>
+</html>
