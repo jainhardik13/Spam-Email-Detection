@@ -8,7 +8,7 @@ import pickle
 # =========================
 # 1. LOAD DATASET
 # =========================
-data = pd.read_csv("final_dataset_new.csv")
+data = pd.read_csv("final_final_dataset.csv")
 
 # Ensure labels are numeric (0 = ham, 1 = spam)
 data["label"] = data["label"].astype(int)
@@ -96,7 +96,7 @@ for i in range(10):
 # =========================
 # 8. SAVE MODEL & VECTORIZER
 # =========================
-pickle.dump(model, open("Model/spam_model.pkl", "wb"))
-pickle.dump(vectorizer, open("Model/vectorizer.pkl", "wb"))
+pickle.dump(model, open("Model/spam_model1.pkl", "wb"))
+pickle.dump(vectorizer, open("Model/vectorizer1.pkl", "wb"))
 
 print("\nModel and vectorizer saved successfully.")

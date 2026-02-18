@@ -7,8 +7,8 @@ from spam_classifier import THRESHOLD
 
 # Load model and vectorizer
 
-model = pickle.load(open("Model/spam_model.pkl", "rb"))
-vectorizer = pickle.load(open("Model/vectorizer.pkl", "rb"))
+model = pickle.load(open("Model/spam_model1.pkl", "rb"))
+vectorizer = pickle.load(open("Model/vectorizer1.pkl", "rb"))
 
 app = FastAPI(title="Spam Email Classifier App")
 
