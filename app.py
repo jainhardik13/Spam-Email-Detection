@@ -1,18 +1,19 @@
 from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from pathlib import Path
 import pickle
 
 from spam_classifier import THRESHOLD
 
-# Load model and vectorizer
-
+# Load model & vectorizer
 model = pickle.load(open("Model/spam_model1.pkl", "rb"))
 vectorizer = pickle.load(open("Model/vectorizer1.pkl", "rb"))
 
-app = FastAPI(title="Spam Email Classifier App")
+app = FastAPI(title="Spam Classifier")
 
-class EmailInput(BaseModel):
+class TextInput(BaseModel):
     message: str
 
 app.add_middleware(
@@ -22,20 +23,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ✅ Serve index.html
 @app.get("/", response_class=HTMLResponse)
-def home():
-    html_file = Path("frontend/index.html")
-    return html_file.read_text()
+def serve_home():
+    return Path("frontend/index.html").read_text(encoding="utf-8")
 
+# ✅ Predict API
 @app.post("/predict")
-def predict_spam(data: EmailInput):
-    message_vector = vectorizer.transform([data.message])
+def predict(data: TextInput):
+    vector = vectorizer.transform([data.message])
+    prob = model.predict_proba(vector)[0][1]
 
-    spam_proba = model.predict_proba(message_vector)[0][1]
-    spam_percent = round(spam_proba * 100, 2)
-
-    prediction = "Spam" if spam_proba >= THRESHOLD else "Not Spam"
-
-    return {"prediction": prediction,
-            "probability": spam_percent
+    return {
+        "prediction": "Spam" if prob >= THRESHOLD else "Not Spam",
+        "probability": round(prob * 100, 2)
     }
