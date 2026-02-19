@@ -1,0 +1,17 @@
+# Core Web Framework
+fastapi==0.115.0
+uvicorn==0.30.6
+
+# Data Validation
+pydantic==2.9.2
+
+# Machine Learning
+scikit-learn==1.5.2
+pandas==2.2.3
+
+# For model persistence
+pickle-mixin==1.0.2
+
+# Additional dependencies
+numpy==2.1.2
+
