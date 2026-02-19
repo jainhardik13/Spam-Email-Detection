@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.git/
+.idea/
+.github/
+archive/
+Testing.ipynb
+.vercelignore
+vercel.json
+*.csv
+run the server
+
