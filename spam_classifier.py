@@ -8,7 +8,16 @@ import pickle
 # =========================
 # 1. LOAD DATASET
 # =========================
-data = pd.read_csv("final_final_dataset.csv")
+data = pd.read_csv("updated_dataset_18_02_2026.csv")
+
+# Check for missing values before processing
+print(f"Total rows: {len(data)}")
+print(f"Rows with missing labels: {data['label'].isna().sum()}")
+print(f"Rows with missing text: {data['text'].isna().sum()}")
+
+# Drop rows with missing labels or text
+data = data.dropna(subset=["label", "text"])
+print(f"Rows after removing missing values: {len(data)}")
 
 # Ensure labels are numeric (0 = ham, 1 = spam)
 data["label"] = data["label"].astype(int)
