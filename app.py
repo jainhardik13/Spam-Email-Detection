@@ -22,7 +22,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.get("/", response_class=HTMLResponse)
+@app.get("/")
 def home():
     html_file = Path("frontend/index.html")
     return html_file.read_text()
