@@ -22,9 +22,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
 def home():
-    return {"Message": "Spam Detection API is running"}
+    html_file = Path("frontend/index.html")
+    return html_file.read_text()
 
 @app.post("/predict")
 def predict_spam(data: EmailInput):
